@@ -66,8 +66,8 @@ const createXLSXFile = async (req, res) => {
     const uploadFolder = path.join(__dirname, './../uploads');
     // Column for data in excel. key must match data key
     worksheet.columns = [
-        { header: "Sku", key: "sku", width: 20 }, 
-        { header: "Stock ids", key: "stock_ids", width: 10 },
+        { header: "Variant", key: "sku", width: 20 }, 
+        { header: "Stock ", key: "stock_ids", width: 10 },
     ];
     const allData = []
     stocks.forEach((stock) =>{
