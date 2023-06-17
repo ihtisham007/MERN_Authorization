@@ -58,39 +58,61 @@ const getFileData =  async (req,res) =>{
 
 const createXLSXFile = async (req, res) => {
     try {
-      // Fetch data from the database
-      const stocks = await Stock.find({});
+    // Fetch data from the database using aggregation
+    /*
+        getting unique data by using _id passing VARIANT
+        push to array if there is any duplication
+    */
+    let stocks = await Stock.aggregate([ 
+        {
+            "$group": {
+              "_id": "$variant",
+              "stock": { "$push" : { "$toString": "$stock" } } 
+            }
+        }
+    ]);
+    //using higher order function to convert array to string 
+    stocks = stocks.map(el => ({
+        varaint: el._id,
+        stock: el.stock.join('|')
+    }))
+    // res
+    //     .status(200)
+    //     .json({
+    //         "data": stocks
+    //     })
     const workbook = new excelJS.Workbook();  // Create a new workbook
     const worksheet = workbook.addWorksheet("My Stock"); // New Worksheet
 
     const uploadFolder = path.join(__dirname, './../uploads');
     // Column for data in excel. key must match data key
     worksheet.columns = [
-        { header: "Variant", key: "sku", width: 20 }, 
-        { header: "Stock ", key: "stock_ids", width: 10 },
+        { header: "Variant", key: "varaint", width: 20 }, 
+        { header: "Stock ", key: "stock", width: 10 },
     ];
-    const allData = []
-    stocks.forEach((stock) =>{
-        const tempStock = {
-            sku: stock.variant,
-            stock_ids: stock.stock
-        }
-        const foundObject = allData.find(obj => obj.sku === stock.variant);
-        foundObject ? foundObject.stock_ids += `|${stock.stock}` : allData.push(tempStock)
-    })
-    worksheet.addRows(allData);
+    //const allData = []
+    // stocks.forEach((stock) =>{
+    //     const tempStock = {
+    //         sku: stock.variant,
+    //         stock_ids: stock.stock
+    //     }
+    //     const foundObject = allData.find(obj => obj.sku === stock.variant);
+    //     foundObject ? foundObject.stock_ids += `|${stock.stock}` : allData.push(tempStock)
+    // })
+    worksheet.addRows(stocks);
 
     // Making first line in excel bold
     worksheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
     });
+    console.log('asdss');
     const data = await workbook.xlsx.writeFile(`${uploadFolder}/stock.xlsx`)
     .then(() => {
         res.send({
             status: "success",
             message: "file successfully downloaded",
-            link: `http://127.0.0.1:5000/uploads/stock.xlsx`,
-            });
+            link: `/stock.xlsx`,
+        });
     });
 
     } catch (error) {

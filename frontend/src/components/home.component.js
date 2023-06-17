@@ -24,7 +24,7 @@ export default class Home extends Component {
       .then((response) => {
         console.log(response.data);
         // Handle the response from the API
-        document.querySelector('.downloadFile').setAttribute('href', response.data.link);
+        document.querySelector('.downloadFile').setAttribute('href', `http://127.0.0.1:5000/uploads/${response.data.link}`);
         document.querySelector('.downloadFile').click();  
         debugger;
       })
