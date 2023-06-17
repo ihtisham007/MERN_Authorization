@@ -72,15 +72,8 @@ const createXLSXFile = async (req, res) => {
         }
     ]);
     //using higher order function to convert array to string 
-    stocks = stocks.map(el => ({
-        varaint: el._id,
-        stock: el.stock.join('|')
-    }))
-    // res
-    //     .status(200)
-    //     .json({
-    //         "data": stocks
-    //     })
+    stocks = stocks.map(el => ({varaint: el._id,stock: el.stock.join('|')}))
+    
     const workbook = new excelJS.Workbook();  // Create a new workbook
     const worksheet = workbook.addWorksheet("My Stock"); // New Worksheet
 
@@ -90,15 +83,6 @@ const createXLSXFile = async (req, res) => {
         { header: "Variant", key: "varaint", width: 20 }, 
         { header: "Stock ", key: "stock", width: 10 },
     ];
-    //const allData = []
-    // stocks.forEach((stock) =>{
-    //     const tempStock = {
-    //         sku: stock.variant,
-    //         stock_ids: stock.stock
-    //     }
-    //     const foundObject = allData.find(obj => obj.sku === stock.variant);
-    //     foundObject ? foundObject.stock_ids += `|${stock.stock}` : allData.push(tempStock)
-    // })
     worksheet.addRows(stocks);
 
     // Making first line in excel bold
