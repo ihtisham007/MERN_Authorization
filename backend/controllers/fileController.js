@@ -73,7 +73,7 @@ const createXLSXFile = async (req, res) => {
     ]);
     //using higher order function to convert array to string 
     stocks = stocks.map(el => ({varaint: el._id,stock: el.stock.join('|')}))
-    
+
     const workbook = new excelJS.Workbook();  // Create a new workbook
     const worksheet = workbook.addWorksheet("My Stock"); // New Worksheet
 
@@ -89,7 +89,6 @@ const createXLSXFile = async (req, res) => {
     worksheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
     });
-    console.log('asdss');
     const data = await workbook.xlsx.writeFile(`${uploadFolder}/stock.xlsx`)
     .then(() => {
         res.send({
